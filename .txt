@@ -1,0 +1,38 @@
+ADMIN TOKEN  => userID = 1 ankit
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjk3NTM4NDI3LCJleHAiOjE3MjkwNzQ0Mjd9.PryqITK5-6ITO4K7P3HsfL1H5BzdxXCI1pAH75ZfuAU
+------------------------------------------------------------------------------------------------------------------------
+
+MERCHANT TOKEN  
+=> userId = 6  rutvi
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiaWF0IjoxNjk3NTM4NDg1LCJleHAiOjE3MjkwNzQ0ODV9.6v8xUY9NDAdka8HVqqqsOm5nJxtw8Fq42-3s1ORMDKI
+
+=> userId = 3  anish
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNjk3NTM4NTY0LCJleHAiOjE3MjkwNzQ1NjR9.ZiShR9TSx3v4XrBW-WcAO1IlbgMu8wmB9OyiKvg2kQU
+
+=> userId =   akshay
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OSwiaWF0IjoxNjk3NjkxMDMwLCJleHAiOjE3MjkyMjcwMzB9._bGIJ1lWVklgiwMvhT1Pa6m6QNAUd_TNTelkYO6mxlc
+----------------------------------------------------------------------------------------------------------------
+
+MANAGER userId = 7 krupali
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiaWF0IjoxNjk3NTM4NjMyLCJleHAiOjE3MjkwNzQ2MzJ9.syY7SB2GqkjUWAYNY8QbG5VOmrW0S-ine_10wLOZNDM
+---------------------------------------------------------------------------------------------------------------------
+
+
+USER TOKEN => 
+=> userId = 4  rahul
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiaWF0IjoxNjk3NTM4ODM2LCJleHAiOjE3MjkwNzQ4MzZ9.7TMPyrOsJyk4xrD5dpjccFecylqUqOXMKZeoq4fPc-8
+
+=> userId = 5     meera
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiaWF0IjoxNjk3NTM4OTE3LCJleHAiOjE3MjkwNzQ5MTd9.zUoa2cyCG-2vkBQXDD7k6CvQIFRdG2yguZAeGUHAmnI
+
+=> userId = 8       anvi
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OCwiaWF0IjoxNjk3NTM4OTc5LCJleHAiOjE3MjkwNzQ5Nzl9.7r4zXwoBIXnGviLB8lK7SVqwLZ4YFVQxBSSZArTR8cs
+
+
+=> userId = 11    sita
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImlhdCI6MTY5Nzc5NDc1MSwiZXhwIjoxNzI5MzMwNzUxfQ.7c_nkrQVX8w1JiTVLM83cMjs0t7lvbNx4BNhexydYS0
+
+
+=> userId = 17 nikita
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTcsImlhdCI6MTY5NzgwMjQwMiwiZXhwIjoxNzI5MzM4NDAyfQ.LHy9LuwZRjTO6rk_cUcs-v8oYteI9xpdEI9goGfLM40
+
