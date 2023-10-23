@@ -68,15 +68,27 @@ const changeCouponStatus = async (req, res) => {
 }
 
 const getAllCoupon = async (req, res) => {
-    let { offset, limit } = req.query
+    let { offset, limit, startDate, endDate } = req.query
 
+    let where = {}
+    if (startDate) {
+        where.startDate = { [Op.gte]: startDate }
+    }
+    if (endDate) {
+        const adjustedEndDate = new Date(new Date(endDate).setUTCHours(23, 59, 59, 999));
+        where.endDate = { [Op.lte]: adjustedEndDate }
+    }
     const options = {
         attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
+        include: [
+            { model: CouponCode, attributes: { exclude: ['createdAt', 'updatedAt', 'isDeleted'] } },
+        ],
     };
-    const { count, rows } = await paginate({ model: Coupon, offsetData: offset, limitData: limit, options: options });
+    const rows = await paginate({ model: Coupon, offsetData: offset, limitData: limit, where: where, options: options });
     const totalCount = await Coupon.count({})
+    const filterCount = rows.length
 
-    res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Coupon list loaded successfully.", data: { totalCount, filterCount: count, rows } })
+    res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Coupon list loaded successfully.", data: { totalCount, filterCount, rows } })
 }
 
 const storeCouponForUser = async (totalAmount, userId) => {
@@ -94,6 +106,8 @@ const storeCouponForUser = async (totalAmount, userId) => {
             const couponCodeData = await CouponCode.findOne({ where: { userId: userId, couponCode: eligibleCoupon.couponCode } })
             if (!couponCodeData) {
                 await CouponCode.create({ userId: userId, couponCode: eligibleCoupon.couponCode, couponId: eligibleCoupon.id })
+                eligibleCoupon.couponUser += 1
+                await eligibleCoupon.save()
             }
         }
 
@@ -121,7 +135,8 @@ const getCouponDiscountAmount = async (couponCode, userId) => {
         });
 
         if (couponData) {
-            couponData.isDeleted = '1'
+            couponData.isDeleted = '1',
+                couponData.applyOn = new Date()
             await couponData.save()
             return couponData.coupon.discount
         } else {

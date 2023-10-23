@@ -5,6 +5,7 @@ const Category = require("../../models/category")
 const Discount = require("../../models/discount")
 const ProductImage = require("../../models/productImage")
 const { fileUpload } = require("../../helper/fileUpload")
+const { paginate } = require('../../common/middleware/pagination')
 const { addProductValidation } = require("../../common/validation")
 const ProductColorVariant = require("../../models/productColorVariant")
 const { BadRequestException } = require("../../common/exceptions/index")
@@ -79,11 +80,9 @@ const addProduct = async (req, res) => {
 const getMyProductList = async (req, res) => {
     const merchantId = req.merchant
     const { limit, offset } = req.query
-    const limitData = parseInt(limit, 10) || 10;
-    const offsetData = parseInt(offset, 10) || 0;
 
-    let data = await Product.findAll({
-        where: { merchantId: merchantId },
+    let where = { merchantId: merchantId }
+    let options = {
         include: [
             {
                 model: Category,
@@ -107,16 +106,14 @@ const getMyProductList = async (req, res) => {
                 required: false
             }
         ],
-        limit: limitData,
-        offset: offsetData,
-        order: [['id', 'DESC']],
         attributes: { exclude: ['merchantId', 'createdAt', 'updatedAt', 'deletedAt', 'categoryId'] }
-    })
+    }
 
+    let rows = await paginate({ model: Product, offsetData: offset, limitData: limit, where: where, options: options });
     const totalCount = await Product.count({ where: { merchantId: merchantId } })
-    const filterCount = data?.length
-    if (data.length > 0) {
-        data = data.map((val) => {
+    const filterCount = rows?.length
+    if (rows.length > 0) {
+        rows = rows.map((val) => {
             const plainData = val.get({ plain: true })
             plainData.productimages = plainData.productimages.map((img) => {
                 return { imgPath: `${IMAGE_PATH.PRODUCT_IMAGE_URL}${img.imagePath}`, id: img.id }
@@ -125,8 +122,7 @@ const getMyProductList = async (req, res) => {
         })
 
     }
-    return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Product list loaded successfully.", data: { totalCount, filterCount, data } })
-
+    return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Product list loaded successfully.", data: { totalCount, filterCount, rows } })
 
 }
 

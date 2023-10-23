@@ -4,22 +4,25 @@ const Product = require("../../models/product")
 const Discount = require("../../models/discount")
 const Category = require("../../models/category")
 const ProductImage = require("../../models/productImage")
+const { paginate } = require('../../common/middleware/pagination')
 const ProductColorVariant = require("../../models/productColorVariant")
 const { BadRequestException } = require("../../common/exceptions/index")
 const { HTTP_STATUS_CODE, IMAGE_PATH } = require("../../helper/constants.helper")
 
 const getProductList = async (req, res) => {
-    const { limit, offset, merchantId } = req.query
-    const limitData = parseInt(limit, 10) || 10;
-    const offsetData = parseInt(offset, 10) || 0;
+    const { limit, offset, merchantId, search } = req.query
 
     let where = {}
     if (merchantId) {
         where = { merchantId: merchantId }
     }
+    if (search) {
+        where[Op.or] = [
+            { productName: { [Op.like]: `%${search}%` } },
+        ];
+    }
 
-    let data = await Product.findAll({
-        where: where,
+    let options = {
         include: [
             {
                 model: User,
@@ -47,16 +50,16 @@ const getProductList = async (req, res) => {
                 required: false
             }
         ],
-        limit: limitData,
-        offset: offsetData,
-        order: [['id', 'DESC']],
+
         attributes: { exclude: ['merchantId', 'createdAt', 'updatedAt', 'deletedAt', 'categoryId'] }
-    })
+    }
+
+    let rows = await paginate({ model: Product, offsetData: offset, limitData: limit, where: where, options: options });
 
     const totalCount = await Product.count({})
-    const filterCount = data.length
-    if (data.length > 0) {
-        data = data.map((val) => {
+    const filterCount = rows.length
+    if (rows.length > 0) {
+        rows = rows.map((val) => {
             const plainData = val.get({ plain: true })
             plainData.productimages = plainData.productimages.map((img) => {
                 return { imgPath: `${IMAGE_PATH.PRODUCT_IMAGE_URL}${img.imagePath}`, id: img.id }
@@ -65,7 +68,7 @@ const getProductList = async (req, res) => {
         })
 
     }
-    return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Product list loaded successfully.", data: { totalCount, filterCount, data } })
+    return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Product list loaded successfully.", data: { totalCount, filterCount, rows } })
 }
 
 const ProductStatus = async (req, res) => {

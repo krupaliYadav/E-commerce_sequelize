@@ -19,6 +19,9 @@ const CouponCode = sequelize.define("couponcode", {
         type: DataTypes.BIGINT,
         allowNull: false,
     },
+    applyOn: {
+        type: DataTypes.DATE
+    },
     isDeleted: {
         type: DataTypes.ENUM('0', '1'),
         defaultValue: '0',

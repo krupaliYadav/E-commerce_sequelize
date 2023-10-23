@@ -6,6 +6,7 @@ const Product = require("../../models/product")
 const Address = require("../../models/address")
 const Discount = require("../../models/discount")
 const ProductImage = require("../../models/productImage")
+const { paginate } = require('../../common/middleware/pagination')
 const { orderPlaceValidation } = require("../../common/validation")
 const { HTTP_STATUS_CODE } = require("../../helper/constants.helper")
 const ProductColorVariant = require("../../models/productColorVariant")
@@ -49,7 +50,7 @@ const orderPlace = async (req, res) => {
         if (validation.length > 0) throw new BadRequestException(`The ${validation.join(', ')} is required.`)
 
         const queryOptions = {
-            where: { id: productId, isActive: '1' },
+            where: { id: productId, isActive: '1', isApproved: '2' },
             include: [
                 {
                     model: Discount,
@@ -92,6 +93,7 @@ const orderPlace = async (req, res) => {
                 productDescription: productData.description,
                 warranty: productData.warranty,
                 price: productData.price,
+                deliveryInDays: productData.deliveryInDays,
                 variantId: productData?.['productcolourvariants.id'],
                 variantName: productData?.['productcolourvariants.colorName'],
                 quantity: quantity,
@@ -157,6 +159,7 @@ const orderPlace = async (req, res) => {
                 productDescription: cartData['product.description'],
                 warranty: cartData['product.warranty'],
                 price: cartData['product.price'],
+                deliveryInDays: cartData['product.deliveryInDays'],
                 variantId: cartData['productcolourvariant.id'],
                 variantName: cartData['productcolourvariant.colorName'],
                 quantity: cartData.totalQuantity,
@@ -188,26 +191,23 @@ const orderPlace = async (req, res) => {
 const getMyOrderList = async (req, res) => {
     const { user: userId, merchant: merchantId } = req;
     const { limit, offset } = req.query
-    const limitData = parseInt(limit, 10) || 10;
-    const offsetData = parseInt(offset, 10) || 0;
 
-    let data = await Order.findAll({
-        where: { userId: userId || merchantId },
+    let where = { userId: userId || merchantId }
+    let options = {
         include: [{
             model: User,
             as: 'merchant',
-            attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'isActive', 'image', 'password', 'roleId'] }
+            attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'isActive', 'image', 'password', 'roleId', 'isReferred', 'walletAmount', 'totalNumOfProduct', 'totalNumOfOrders'] }
         }],
-        limit: limitData,
-        offset: offsetData,
-        order: [['createdAt', 'DESC']],
         attributes: {
             exclude: ['deletedAt', 'createdAt', 'updatedAt', ''],
-        },
-    })
+        }
+    }
+
+    const rows = await paginate({ model: Order, offsetData: offset, limitData: limit, where: where, options: options });
     const totalCount = await Order.count({ where: { userId: userId || merchantId } })
-    const filterCount = data?.length
-    return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Order details loaded successfully.", data: { totalCount, filterCount, data } })
+    const filterCount = rows?.length
+    return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Order details loaded successfully.", data: { totalCount, filterCount, rows } })
 }
 
 module.exports = {

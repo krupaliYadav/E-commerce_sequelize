@@ -39,6 +39,10 @@ const Order = sequelize.define("order", {
         type: DataTypes.STRING,
         allowNull: false
     },
+    deliveryInDays: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
     warranty: {
         type: DataTypes.INTEGER,
         allowNull: false,

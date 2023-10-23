@@ -1,5 +1,5 @@
 'use strict';
-
+// For add seeder in db -> npx sequelize-cli db:seed:all
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {

@@ -1,11 +1,10 @@
 const { HTTP_STATUS_CODE } = require("../../helper/constants.helper")
 exports.paginate = async ({ model, offsetData, limitData, where = {}, options }) => {
     try {
-        console.log(model, offsetData, limitData, where, options);
         const limit = parseInt(limitData, 10) || 10;
         const offset = parseInt(offsetData, 10) || 0;
         const { attributes = {}, include = [] } = options || {}
-        let { count, rows } = await model.findAndCountAll({
+        let rows = await model.findAll({
             where: where,
             include: include,
             order: [['id', 'DESC']],
@@ -14,7 +13,7 @@ exports.paginate = async ({ model, offsetData, limitData, where = {}, options })
             offset: offset,
         });
 
-        return { count, rows }
+        return rows
 
     } catch (error) {
         return { status: HTTP_STATUS_CODE.INTERNAL_SERVER, success: false, message: error.message }

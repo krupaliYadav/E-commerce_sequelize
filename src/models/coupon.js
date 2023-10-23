@@ -31,6 +31,10 @@ const Coupon = sequelize.define("coupon", {
         type: DataTypes.DATE,
         allowNull: false
     },
+    couponUser: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    },
     isActive: {
         type: DataTypes.ENUM('0', '1'),
         defaultValue: '1',

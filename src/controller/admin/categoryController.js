@@ -41,8 +41,7 @@ const getAllCategory = async (req, res) => {
         attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
     };
 
-    const totalCount = await Category.count({})
-    const { count, rows } = await paginate({ model: Category, offsetData: offset, limitData: limit, where: where, options: options });
+    const rows = await paginate({ model: Category, offsetData: offset, limitData: limit, where: where, options: options });
     if (rows.length > 0) {
         rows.map((val) => {
             let plainData = val.get({ plain: true })
@@ -50,7 +49,9 @@ const getAllCategory = async (req, res) => {
             return plainData
         })
     }
-    res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Category list loaded successfully.", data: { totalCount, filterCount: count, rows } })
+    const totalCount = await Category.count({})
+    const filterCount = rows.length
+    res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Category list loaded successfully.", data: { totalCount, filterCount, rows } })
 }
 
 const getSingleCategory = async (req, res) => {

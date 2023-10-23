@@ -1,31 +1,28 @@
 const User = require("../../models/user")
 const Order = require("../../models/order")
+const { paginate } = require('../../common/middleware/pagination')
 const { HTTP_STATUS_CODE } = require("../../helper/constants.helper")
 const { BadRequestException } = require("../../common/exceptions/index")
 
 const getAllOrderList = async (req, res) => {
     const merchantId = req.merchant
     const { limit, offset } = req.query
-    const limitData = parseInt(limit, 10) || 10;
-    const offsetData = parseInt(offset, 10) || 0;
 
-    let data = await Order.findAll({
-        where: { merchantId: merchantId },
+    let where = { merchantId: merchantId }
+    let options = {
         include: [{
             model: User,
-            attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'isActive', 'image', 'password', 'roleId'] }
+            attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'isActive', 'image', 'password', 'roleId', 'isReferred', 'walletAmount', 'totalNumOfProduct', 'totalNumOfOrders'] }
         }],
         attributes: {
             exclude: ['deletedAt', 'createdAt', 'updatedAt'],
         },
-        limit: limitData,
-        offset: offsetData,
-        order: [['createdAt', 'DESC']]
-    })
+    }
 
+    const rows = await paginate({ model: Order, offsetData: offset, limitData: limit, where: where, options: options });
     const totalCount = await Order.count({ where: { merchantId: merchantId } })
-    const filterCount = data?.length
-    return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Order details loaded successfully.", data: { totalCount, filterCount, data } })
+    const filterCount = rows?.length
+    return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Order details loaded successfully.", data: { totalCount, filterCount, rows } })
 }
 
 const changeOrderStatus = async (req, res) => {

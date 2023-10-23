@@ -32,8 +32,7 @@ const getUser = async (req, res) => {
         ],
     };
 
-    const totalCount = await User.count({})
-    let { count, rows } = await paginate({ model: User, offsetData: offset, limitData: limit, where: where, options: options });
+    let rows = await paginate({ model: User, offsetData: offset, limitData: limit, where: where, options: options });
 
     if (rows.length > 0) {
         rows = rows.map((val) => {
@@ -44,7 +43,9 @@ const getUser = async (req, res) => {
             return plainData
         })
     }
-    return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "User list loaded successfully.", data: { totalCount, filterCount: count, rows } })
+    const totalCount = await User.count({})
+    const filterCount = rows.length
+    return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "User list loaded successfully.", data: { totalCount, filterCount, rows } })
 }
 
 const changeUserStatus = async (req, res) => {

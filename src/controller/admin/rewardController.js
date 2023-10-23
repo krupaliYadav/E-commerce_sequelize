@@ -44,7 +44,7 @@ const getRewardList = async (req, res) => {
         attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
         include: [{
             model: User,
-            attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'isActive', 'image', 'password', 'roleId'] }
+            attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'isActive', 'image', 'password', 'roleId', 'isReferred', 'walletAmount', 'totalNumOfProduct', 'totalNumOfOrders'] }
         }]
     })
 
