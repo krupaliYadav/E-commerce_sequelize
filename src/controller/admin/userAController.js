@@ -8,24 +8,54 @@ const { HTTP_STATUS_CODE } = require("../../helper/constants.helper")
 const { BadRequestException } = require("../../common/exceptions/index")
 
 const getUser = async (req, res) => {
-    const { offset, limit, role, search, userId } = req.query;
+    const { offset, limit, role, search, userId, fromDate, toDate, firstName, lastName, email, phoneNumber } = req.query;
     let where = {};
     if (role) {
         where = { roleId: role }
+    }
+    if (userId) {
+        where = { id: userId }
     }
     if (search) {
         where[Op.or] = [
             { firstName: { [Op.like]: `%${search}%` } },
             { lastName: { [Op.like]: `%${search}%` } },
             { email: { [Op.like]: `%${search}%` } },
+            { phoneNumber: { [Op.like]: `%${search}%` } },
         ];
     }
-
-    if (userId) {
-        where = { id: userId }
+    if (firstName) {
+        where.firstName = { [Op.like]: `%${firstName}%` }
     }
+
+    if (lastName) {
+        where.lastName = { [Op.like]: `%${lastName}%` }
+    }
+
+    if (email) {
+        where.email = { [Op.like]: `%${email}%` }
+    }
+
+    if (phoneNumber) {
+        where.phoneNumber = { [Op.like]: `%${phoneNumber}%` }
+    }
+
+    if (fromDate && !toDate) {
+        where.createdAt = { [Op.gte]: fromDate }
+    }
+    if (toDate && !fromDate) {
+        where.createdAt = { [Op.lte]: toDate }
+    }
+
+    if (fromDate && toDate) {
+        where[Op.and] = [
+            { createdAt: { [Op.gte]: fromDate } },
+            { createdAt: { [Op.lte]: toDate } }
+        ]
+    }
+
     const options = {
-        attributes: { exclude: ['deletedAt', 'updatedAt', 'createdAt', 'password', 'image'] },
+        attributes: { exclude: ['deletedAt', 'updatedAt', 'password', 'image'] },
         include: [
             { model: Role, attributes: ['name'] },
             { model: Address, attributes: ['id', 'address'] },
