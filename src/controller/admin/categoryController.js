@@ -6,7 +6,6 @@ const { fileUpload, deleteFile } = require("../../helper/fileUpload")
 const { BadRequestException } = require("../../common/exceptions/index")
 const { HTTP_STATUS_CODE, IMAGE_PATH } = require("../../helper/constants.helper")
 
-
 const addCategory = async (req, res) => {
     const form = formidable({ multiples: true })
     form.parse(req, async (err, fields, files) => {
@@ -41,7 +40,7 @@ const getAllCategory = async (req, res) => {
         attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
     };
 
-    const rows = await paginate({ model: Category, offsetData: offset, limitData: limit, where: where, options: options });
+    const { count, rows } = await paginate({ model: Category, offsetData: offset, limitData: limit, where: where, options: options });
     if (rows.length > 0) {
         rows.map((val) => {
             let plainData = val.get({ plain: true })
@@ -49,9 +48,8 @@ const getAllCategory = async (req, res) => {
             return plainData
         })
     }
-    const totalCount = await Category.count({})
-    const filterCount = rows.length
-    res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Category list loaded successfully.", data: { totalCount, filterCount, rows } })
+
+    res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Category list loaded successfully.", data: { totalCount: count, rows } })
 }
 
 const getSingleCategory = async (req, res) => {
@@ -86,7 +84,7 @@ const updateCategory = async (req, res) => {
             if (files.image) {
                 let result = await fileUpload(files.image, ['jpg', 'png', 'jpeg'], 'category')
                 if (result.success === false) {
-                    res.status(result.status).json(result)
+                    return res.status(result.status).json(result)
                 } else {
                     fields.image = result
                 }
@@ -112,6 +110,7 @@ const deleteCategory = async (req, res) => {
         throw new BadRequestException("Category details not found.")
     } else {
         await Category.destroy({ where: { id: categoryId } });
+        await deleteFile('category', category.image)
         res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Category deleted successfully." })
     }
 }
@@ -120,6 +119,7 @@ const changeCategoryStatus = async (req, res) => {
     const { categoryId } = req.params
     const { status } = req.body
     if (!status) throw new BadRequestException("Category status is required.")
+    if (status != '0' && status != '1') throw new BadRequestException('Status must be either 0 or 1.')
     const category = await Category.findOne({ where: { id: categoryId } });
 
     if (!category) {

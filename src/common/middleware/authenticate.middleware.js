@@ -22,6 +22,10 @@ exports.isAuthenticated = (requiredRole) => async (req, res, next) => {
         if (!user) {
             return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ status: HTTP_STATUS_CODE.UNAUTHORIZED, success: false, message: "Token is expired or Invalid." });
         }
+        if (user.accessToken !== token) {
+            return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ status: HTTP_STATUS_CODE.UNAUTHORIZED, success: false, message: "Access denied" });
+        }
+
         if (user.isActive === '0') {
             return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ status: HTTP_STATUS_CODE.UNAUTHORIZED, success: false, message: "Access denied" });
         }

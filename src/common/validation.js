@@ -38,7 +38,7 @@ const login = Joi.object().keys({
 })
 
 const addProductValidation = [
-    'categoryId', 'productName', 'price', 'description', 'warranty', 'quantity'
+    'categoryId', 'productName', 'price', 'description', 'warranty', 'quantity', 'deliveryInDays'
 ]
 
 const addToCartValidation = Joi.object().keys({

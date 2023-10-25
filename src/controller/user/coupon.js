@@ -26,10 +26,8 @@ const getMyCouponList = async (req, res) => {
         },
     }
 
-    const rows = await paginate({ model: CouponData, offsetData: offset, limitData: limit, where: where, options: options });
-    const totalCount = await CouponData.count({ where: { userId: userId || merchantId, isDeleted: '0' } })
-    const filterCount = rows?.length
-    return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Coupon details loaded successfully.", data: { totalCount, filterCount, rows } })
+    const { count, rows } = await paginate({ model: CouponData, offsetData: offset, limitData: limit, where: where, options: options });
+    return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Coupon details loaded successfully.", data: { totalCount: count, rows } })
 
 }
 

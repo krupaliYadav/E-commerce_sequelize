@@ -19,10 +19,9 @@ const getAllOrderList = async (req, res) => {
         },
     }
 
-    const rows = await paginate({ model: Order, offsetData: offset, limitData: limit, where: where, options: options });
-    const totalCount = await Order.count({ where: { merchantId: merchantId } })
-    const filterCount = rows?.length
-    return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Order details loaded successfully.", data: { totalCount, filterCount, rows } })
+    const { count, rows } = await paginate({ model: Order, offsetData: offset, limitData: limit, where: where, options: options });
+
+    return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Order details loaded successfully.", data: { totalCount: count, rows } })
 }
 
 const changeOrderStatus = async (req, res) => {

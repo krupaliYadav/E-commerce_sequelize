@@ -33,9 +33,19 @@ const Product = sequelize.define('product', {
     warranty: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        validate: {
+            isInt: {
+                msg: "Warranty must be an number."
+            }
+        }
     },
     quantity: {
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER,
+        validate: {
+            isInt: {
+                msg: "Quantity must be an number."
+            }
+        }
     },
     isApproved: {
         type: DataTypes.ENUM('1', '2', '3'),
@@ -54,7 +64,12 @@ const Product = sequelize.define('product', {
     },
     deliveryInDays: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        validate: {
+            isInt: {
+                msg: "Delivery in days must be an number."
+            }
+        }
     },
     totalNumOfOrders: {
         type: DataTypes.INTEGER,

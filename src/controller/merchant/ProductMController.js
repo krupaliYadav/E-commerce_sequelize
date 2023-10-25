@@ -23,6 +23,11 @@ const addProduct = async (req, res) => {
             if (validation.length > 0) {
                 return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ status: HTTP_STATUS_CODE.BAD_REQUEST, success: false, message: `The ${validation.join(', ')} is required.` })
             }
+            console.log(typeof deliveryInDays);
+
+            // if (typeof deliveryInDays != ) {
+
+            // }
 
             const isCategoryExits = await Category.findOne({ where: { id: categoryId, isActive: '1' } })
             if (!isCategoryExits) {
@@ -109,9 +114,8 @@ const getMyProductList = async (req, res) => {
         attributes: { exclude: ['merchantId', 'createdAt', 'updatedAt', 'deletedAt', 'categoryId'] }
     }
 
-    let rows = await paginate({ model: Product, offsetData: offset, limitData: limit, where: where, options: options });
-    const totalCount = await Product.count({ where: { merchantId: merchantId } })
-    const filterCount = rows?.length
+    let { count, rows } = await paginate({ model: Product, offsetData: offset, limitData: limit, where: where, options: options });
+
     if (rows.length > 0) {
         rows = rows.map((val) => {
             const plainData = val.get({ plain: true })
@@ -122,7 +126,7 @@ const getMyProductList = async (req, res) => {
         })
 
     }
-    return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Product list loaded successfully.", data: { totalCount, filterCount, rows } })
+    return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Product list loaded successfully.", data: { totalCount: count, rows } })
 
 }
 
@@ -177,7 +181,7 @@ const UpdateIsAvailable = async (req, res) => {
     const productId = req.params.productId
     const { status } = req.body
     if (!status) throw new BadRequestException("Status is required.")
-
+    if (status != '0' && status != '1') throw new BadRequestException('Status must be either 0 or 1.')
     const product = await Product.findOne({ where: { id: productId, merchantId: merchantId } })
     if (product) {
         await Product.update({ isAvailable: status }, { where: { id: productId } })

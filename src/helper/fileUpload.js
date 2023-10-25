@@ -10,14 +10,14 @@ const fileUpload = async (file, allowedTypes, filePath) => {
         const extension = img[1].toLowerCase();
 
         if (!allowedTypes.includes(extension)) {
-            return { status: HTTP_STATUS_CODE.INTERNAL_SERVER, success: false, message: `The ${extension} is not allowed..` }
+            return { status: HTTP_STATUS_CODE.BAD_REQUEST, success: false, message: `The ${extension} is not allowed..` }
         };
 
         const fileName = uuidv4() + "." + extension
         const newPath = path.resolve(__dirname, "../../" + `/public/${filePath}/${fileName}`);
         fs.copyFile(file.filepath, newPath, async (err) => {
             if (err) {
-                return { status: HTTP_STATUS_CODE.INTERNAL_SERVER, success: false, message: err.message }
+                return { status: HTTP_STATUS_CODE.BAD_REQUEST, success: false, message: err.message }
             }
         })
         return fileName

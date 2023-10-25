@@ -52,7 +52,10 @@ const User = sequelize.define('user', {
     totalNumOfOrders: {
         type: DataTypes.INTEGER,
         defaultValue: 0
-    }
+    },
+    accessToken: {
+        type: DataTypes.STRING
+    },
 }, {
     paranoid: true,
     timestamps: true

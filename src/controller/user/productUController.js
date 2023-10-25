@@ -58,9 +58,7 @@ const getAllProducts = async (req, res) => {
         attributes: { exclude: ['merchantId', 'createdAt', 'updatedAt', 'deletedAt', 'categoryId'] },
     }
 
-    let rows = await paginate({ model: Product, offsetData: offset, limitData: limit, where: where, options: options });
-    const totalCount = await Product.count({ where: { isApproved: '2', isActive: '1' } })
-    const filterCount = rows.length
+    let { count, rows } = await paginate({ model: Product, offsetData: offset, limitData: limit, where: where, options: options });
 
     if (rows.length > 0) {
         rows = rows.map((val) => {
@@ -72,7 +70,7 @@ const getAllProducts = async (req, res) => {
         })
 
     }
-    return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Product list loaded successfully.", data: { totalCount, filterCount, rows } })
+    return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Product list loaded successfully.", data: { totalCount: count, rows } })
 }
 
 const addToCart = async (req, res) => {

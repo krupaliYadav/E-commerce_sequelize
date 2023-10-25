@@ -11,23 +11,21 @@ const getAllOrders = async (req, res) => {
         include: [
             {
                 model: User,
-                attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'isActive', 'image', 'password', 'roleId'] }
+                attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'isActive', 'image', 'password', 'roleId', 'accessToken'] }
             },
             {
                 model: User,
                 as: "merchant",
-                attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'isActive', 'image', 'password', 'roleId'] }
+                attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'isActive', 'image', 'password', 'roleId', 'accessToken'] }
             },
         ],
         attributes: {
             exclude: ['deletedAt', 'createdAt', 'updatedAt'],
         },
     }
-    const rows = await paginate({ model: Order, offsetData: offset, limitData: limit, options: option });
+    const { count, rows } = await paginate({ model: Order, offsetData: offset, limitData: limit, options: option });
 
-    const totalCount = await Order.count()
-    const filterCount = rows.length
-    return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Order details loaded successfully.", data: { totalCount, filterCount, rows } })
+    return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Order details loaded successfully.", data: { totalCount: count, rows } })
 }
 
 module.exports = {

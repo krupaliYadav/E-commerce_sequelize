@@ -26,7 +26,7 @@ const getProductList = async (req, res) => {
         include: [
             {
                 model: User,
-                attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'isActive', 'image', 'password'] }
+                attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'isActive', 'image', 'password', 'accessToken'] }
             },
             {
                 model: Category,
@@ -54,10 +54,8 @@ const getProductList = async (req, res) => {
         attributes: { exclude: ['merchantId', 'createdAt', 'updatedAt', 'deletedAt', 'categoryId'] }
     }
 
-    let rows = await paginate({ model: Product, offsetData: offset, limitData: limit, where: where, options: options });
+    let { count, rows } = await paginate({ model: Product, offsetData: offset, limitData: limit, where: where, options: options });
 
-    const totalCount = await Product.count({})
-    const filterCount = rows.length
     if (rows.length > 0) {
         rows = rows.map((val) => {
             const plainData = val.get({ plain: true })
@@ -68,14 +66,14 @@ const getProductList = async (req, res) => {
         })
 
     }
-    return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Product list loaded successfully.", data: { totalCount, filterCount, rows } })
+    return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Product list loaded successfully.", data: { totalCount: count, rows } })
 }
 
 const ProductStatus = async (req, res) => {
     const productId = req.params.productId
     const { status } = req.body
     if (!status) throw new BadRequestException("Status is required.")
-
+    if (status != '2' && status != '3') throw new BadRequestException('Status must be either 2 or 3.')
     const product = await Product.findByPk(productId)
     if (product) {
         await Product.update({ isApproved: status }, { where: { id: productId } })

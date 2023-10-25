@@ -11,6 +11,10 @@ module.exports = (err, req, res, next) => {
         });
     }
 
+    if (err.name === 'SequelizeValidationError') {
+        return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ status: HTTP_STATUS_CODE.BAD_REQUEST, success: false, message: err.message });
+    }
+
     if (err instanceof GeneralError) {
         return res.status(err.statusCode).json({ status: err.statusCode, success: false, message: err.message });
     }

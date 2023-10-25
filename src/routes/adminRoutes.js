@@ -7,7 +7,7 @@ const { addRewardValidation, addCouponValidation } = require("../common/validati
 
 routes
     // user
-    .get("/getUsers", isAuthenticatedAdminOrManager, expressAsyncHandler(adminUserController.getUser))
+    .post("/getUsers", isAuthenticatedAdminOrManager, expressAsyncHandler(adminUserController.getUser))
     .post("/changeUserStatus/:userId", isAuthenticatedAdmin, expressAsyncHandler(adminUserController.changeUserStatus))
 
     // category

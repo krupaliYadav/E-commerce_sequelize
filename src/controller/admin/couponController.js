@@ -57,10 +57,11 @@ const changeCouponStatus = async (req, res) => {
     const couponId = req.params.couponId
     const { status } = req.body
     if (!status) throw new BadRequestException("Coupon status is required.")
+    if (status != '0' && status != '1') throw new BadRequestException('Status must be either 0 or 1.')
     const coupon = await Coupon.findOne({ where: { id: couponId } });
 
     if (!coupon) {
-        throw new BadRequestException("Category details not found.")
+        throw new BadRequestException("Coupon details not found.")
     } else {
         await Coupon.update({ isActive: status }, { where: { id: couponId } });
         return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Coupon status updated successfully." })
@@ -84,11 +85,9 @@ const getAllCoupon = async (req, res) => {
             { model: CouponCode, attributes: { exclude: ['createdAt', 'updatedAt', 'isDeleted'] } },
         ],
     };
-    const rows = await paginate({ model: Coupon, offsetData: offset, limitData: limit, where: where, options: options });
-    const totalCount = await Coupon.count({})
-    const filterCount = rows.length
+    const { count, rows } = await paginate({ model: Coupon, offsetData: offset, limitData: limit, where: where, options: options });
 
-    res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Coupon list loaded successfully.", data: { totalCount, filterCount, rows } })
+    res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Coupon list loaded successfully.", data: { totalCount: count, rows } })
 }
 
 const storeCouponForUser = async (totalAmount, userId) => {
