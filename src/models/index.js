@@ -62,8 +62,8 @@ Order.belongsTo(User, { foreignKey: 'userId' })
 Product.hasOne(Discount, { foreignKey: 'productId' })
 Discount.belongsTo(Product, { foreignKey: 'productId' })
 
-User.hasMany(Reward, { foreignKey: "updatedBy" })
-Reward.belongsTo(User, { foreignKey: "updatedBy" })
+User.hasMany(Reward, { foreignKey: "addedBy", as: 'addBy' })
+Reward.belongsTo(User, { foreignKey: "addedBy", as: 'addBy' })
 
 Coupon.hasMany(CouponCode, { foreignKey: "couponId" })
 CouponCode.belongsTo(Coupon, { foreignKey: "couponId" })

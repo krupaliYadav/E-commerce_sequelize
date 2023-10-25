@@ -10,7 +10,7 @@ const { BadRequestException } = require("../../common/exceptions/index")
 const { HTTP_STATUS_CODE, IMAGE_PATH } = require("../../helper/constants.helper")
 
 const getProductList = async (req, res) => {
-    const { limit, offset, merchantId, search } = req.query
+    const { limit, offset, merchantId, search, status } = req.query
 
     let where = {}
     if (merchantId) {
@@ -20,6 +20,10 @@ const getProductList = async (req, res) => {
         where[Op.or] = [
             { productName: { [Op.like]: `%${search}%` } },
         ];
+    }
+
+    if (status) {
+        where = { isApproved: status }
     }
 
     let options = {
@@ -74,6 +78,7 @@ const ProductStatus = async (req, res) => {
     const { status } = req.body
     if (!status) throw new BadRequestException("Status is required.")
     if (status != '2' && status != '3') throw new BadRequestException('Status must be either 2 or 3.')
+
     const product = await Product.findByPk(productId)
     if (product) {
         await Product.update({ isApproved: status }, { where: { id: productId } })

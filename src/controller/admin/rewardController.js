@@ -4,8 +4,7 @@ const { HTTP_STATUS_CODE } = require("../../helper/constants.helper")
 const { BadRequestException } = require("../../common/exceptions/index")
 
 const addReward = async (req, res) => {
-    const adminId = req.admin;
-    const managerId = req.manager;
+    const { admin: adminId, manager: managerId } = req;
     const { rewardAmount } = req.body
 
     await Reward.create({
@@ -17,8 +16,7 @@ const addReward = async (req, res) => {
 }
 
 const updateReward = async (req, res) => {
-    const adminId = req.admin;
-    const managerId = req.manager;
+    const { admin: adminId, manager: managerId } = req;
     const rewardId = req.params.rewardId
     const { rewardAmount } = req.body
 
@@ -26,7 +24,7 @@ const updateReward = async (req, res) => {
     if (reward) {
         await Reward.destroy({ where: { id: rewardId } })
         await Reward.create({
-            updatedBy: adminId || managerId,
+            addedBy: adminId || managerId,
             rewardAmount: rewardAmount
         })
         return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Referral reward updated successfully." })
@@ -44,7 +42,8 @@ const getRewardList = async (req, res) => {
         attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
         include: [{
             model: User,
-            attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'isActive', 'image', 'password', 'roleId', 'isReferred', 'walletAmount', 'totalNumOfProduct', 'totalNumOfOrders'] }
+            as: 'addBy',
+            attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'isActive', 'image', 'password', 'roleId', 'isReferred', 'walletAmount', 'totalNumOfProduct', 'totalNumOfOrders', 'accessToken'] }
         }]
     })
 

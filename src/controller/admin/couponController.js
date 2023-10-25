@@ -58,6 +58,7 @@ const changeCouponStatus = async (req, res) => {
     const { status } = req.body
     if (!status) throw new BadRequestException("Coupon status is required.")
     if (status != '0' && status != '1') throw new BadRequestException('Status must be either 0 or 1.')
+
     const coupon = await Coupon.findOne({ where: { id: couponId } });
 
     if (!coupon) {

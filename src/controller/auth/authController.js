@@ -14,6 +14,7 @@ const singUp = async (req, res) => {
     let { email, password, roleId, address, phoneNumber, isReferral, referralId } = req.body
     let referralDetails = {}
 
+    // validations
     const user = await User.findOne({ where: { email: email } })
     if (user) {
         throw new ConflictRequestException("An account already exists with this email address.")
@@ -50,7 +51,7 @@ const singUp = async (req, res) => {
     }
 
 
-    // if user is referred by then add in referral table and also and reward amount in referral wallet
+    // if user is referred by then add in referral table and also added reward amount in referral's wallet
     if (isReferral == 'true') {
         let rewardDetails = await Reward.findOne({ plain: true })
         await Referral.create({

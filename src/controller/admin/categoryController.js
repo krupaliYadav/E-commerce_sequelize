@@ -10,6 +10,8 @@ const addCategory = async (req, res) => {
     const form = formidable({ multiples: true })
     form.parse(req, async (err, fields, files) => {
         let { name } = fields
+
+        // validations
         if (!name) return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ status: HTTP_STATUS_CODE.BAD_REQUEST, success: true, message: "Category name is required." })
         const isCategoryExits = await Category.findOne({ where: { name: name } })
         if (isCategoryExits) return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ status: HTTP_STATUS_CODE.BAD_REQUEST, success: true, message: "Category name already exits" })
@@ -40,12 +42,11 @@ const getAllCategory = async (req, res) => {
         attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
     };
 
-    const { count, rows } = await paginate({ model: Category, offsetData: offset, limitData: limit, where: where, options: options });
+    let { count, rows } = await paginate({ model: Category, offsetData: offset, limitData: limit, where: where, options: options });
     if (rows.length > 0) {
-        rows.map((val) => {
-            let plainData = val.get({ plain: true })
-            plainData.image = `${IMAGE_PATH.CATEGORY_IMAGE_URL}${plainData.image}`
-            return plainData
+        rows = rows.map((val) => {
+            val.image = `${IMAGE_PATH.CATEGORY_IMAGE_URL}${val.image}`
+            return val
         })
     }
 
@@ -118,8 +119,10 @@ const deleteCategory = async (req, res) => {
 const changeCategoryStatus = async (req, res) => {
     const { categoryId } = req.params
     const { status } = req.body
+
     if (!status) throw new BadRequestException("Category status is required.")
     if (status != '0' && status != '1') throw new BadRequestException('Status must be either 0 or 1.')
+
     const category = await Category.findOne({ where: { id: categoryId } });
 
     if (!category) {

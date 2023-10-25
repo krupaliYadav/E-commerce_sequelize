@@ -202,7 +202,7 @@ const getMyOrderList = async (req, res) => {
         include: [{
             model: User,
             as: 'merchant',
-            attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'isActive', 'image', 'password', 'roleId', 'isReferred', 'walletAmount', 'totalNumOfProduct', 'totalNumOfOrders'] }
+            attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'isActive', 'image', 'password', 'roleId', 'isReferred', 'walletAmount', 'totalNumOfProduct', 'totalNumOfOrders', 'accessToken'] }
         }],
         attributes: {
             exclude: ['deletedAt', 'createdAt', 'updatedAt', ''],

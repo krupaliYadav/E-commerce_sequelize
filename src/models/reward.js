@@ -10,9 +10,6 @@ const Reward = sequelize.define('reward', {
     addedBy: {
         type: DataTypes.BIGINT,
     },
-    updatedBy: {
-        type: DataTypes.BIGINT,
-    },
     rewardAmount: {
         type: DataTypes.INTEGER,
         allowNull: false,
