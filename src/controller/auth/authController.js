@@ -27,7 +27,7 @@ const singUp = async (req, res) => {
     const isRoleExits = await Role.findByPk(roleId)
     if (!isRoleExits) throw new BadRequestException('RoleId not exits.')
 
-    if (isReferral != 'true' && isReferral != 'false') throw new BadRequestException('isReferral must be either true or false.')
+    if (isReferral && isReferral != 'true' && isReferral != 'false') throw new BadRequestException('isReferral must be either true or false.')
     if (isReferral == 'true') {
         if (!referralId) {
             throw new BadRequestException('Referral id is required.')

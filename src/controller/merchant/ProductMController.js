@@ -5,6 +5,7 @@ const Category = require("../../models/category")
 const Discount = require("../../models/discount")
 const ProductImage = require("../../models/productImage")
 const { fileUpload } = require("../../helper/fileUpload")
+const { sequelize } = require("../../../config/database")
 const { paginate } = require('../../common/middleware/pagination')
 const { addProductValidation } = require("../../common/validation")
 const ProductColorVariant = require("../../models/productColorVariant")
@@ -16,6 +17,7 @@ const addProduct = async (req, res) => {
     let form = formidable({ multiples: true })
     form.parse(req, async (err, fields, files) => {
         try {
+            const t = await sequelize.transaction()
             const { categoryId, productName, price, highlights, description, warranty, quantity, colorVariant, deliveryInDays } = fields
             let imgData = []
 
@@ -23,11 +25,6 @@ const addProduct = async (req, res) => {
             if (validation.length > 0) {
                 return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ status: HTTP_STATUS_CODE.BAD_REQUEST, success: false, message: `The ${validation.join(', ')} is required.` })
             }
-            console.log(typeof deliveryInDays);
-
-            // if (typeof deliveryInDays != ) {
-
-            // }
 
             const isCategoryExits = await Category.findOne({ where: { id: categoryId, isActive: '1' } })
             if (!isCategoryExits) {
@@ -61,22 +58,22 @@ const addProduct = async (req, res) => {
                 warranty: warranty,
                 quantity: quantity,
                 deliveryInDays: deliveryInDays
-            })
+            }, { transaction: t })
 
             if (product) {
                 const data = imgData.map((val) => {
                     return { productId: product.id, imagePath: val }
                 })
-                await ProductImage.bulkCreate(data)
+                await ProductImage.bulkCreate(data, { transaction: t })
                 if (colorVariant) {
                     colorVariant.map(val => val.productId = product.id)
-                    await ProductColorVariant.bulkCreate(colorVariant)
+                    await ProductColorVariant.bulkCreate(colorVariant, { transaction: t })
                 }
             }
+            await t.commit()
             return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Product added successfully." })
-
-
         } catch (error) {
+            if (t) await t.rollback();
             return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER).json({ status: HTTP_STATUS_CODE.INTERNAL_SERVER, success: false, message: error.message })
         }
     })

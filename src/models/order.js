@@ -58,7 +58,12 @@ const Order = sequelize.define("order", {
         type: DataTypes.STRING,
     },
     quantity: {
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER,
+        validate: {
+            isInt: {
+                msg: "Quantity must be an number."
+            }
+        }
     },
     status: {
         type: DataTypes.INTEGER,
@@ -72,9 +77,6 @@ const Order = sequelize.define("order", {
         },
         comment: '0 = pending, 1 = accepted, 2 = cancelled, 3 = inProgress, 4 = completed',
     },
-    // deliveryDate: {
-    //     type: DataTypes.DATE
-    // }
     discount: {
         type: DataTypes.INTEGER,
         defaultValue: 0

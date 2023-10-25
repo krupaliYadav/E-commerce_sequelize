@@ -6,6 +6,7 @@ const Product = require("../../models/product")
 const Address = require("../../models/address")
 const Discount = require("../../models/discount")
 const ProductImage = require("../../models/productImage")
+const { sequelize } = require("../../../config/database")
 const { paginate } = require('../../common/middleware/pagination')
 const { orderPlaceValidation } = require("../../common/validation")
 const { HTTP_STATUS_CODE } = require("../../helper/constants.helper")
@@ -15,9 +16,9 @@ const { storeCouponForUser, getCouponDiscountAmount } = require("../admin/coupon
 
 const orderPlace = async (req, res) => {
     const { user: userId, merchant: merchantId } = req;
-
     const { cartId, productId, addressId, quantity, variantId, isUsedWallet, isUsedCoupon, couponCode } = req.body
 
+    const t = await sequelize.transaction()
     let wallet = 0;
     let setData = {};
     let walletDetails = {}
@@ -33,6 +34,7 @@ const orderPlace = async (req, res) => {
     if (!address) throw new BadRequestException("This address not match for this user.")
 
     // if isUseWallet is true then cut it subtract from payable amount.
+    if (isUsedWallet && isUsedWallet != true && isUsedWallet != false) throw new BadRequestException('isUsedWallet must be either true or false.')
     if (isUsedWallet === true && !isUsedCoupon) {
         walletDetails = await User.findOne({ where: { id: userId || merchantId }, plain: true })
         wallet = walletDetails.walletAmount
@@ -63,6 +65,8 @@ const orderPlace = async (req, res) => {
         };
 
         if (variantId) {
+            let isVariantIdExits = await ProductColorVariant.findOne({ where: { id: variantId, productId: productId } })
+            if (!isVariantIdExits) throw new BadRequestException('Variant  not exits for this product.')
             queryOptions.include.push({ model: ProductColorVariant, where: { id: variantId }, attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt'] } });
         }
         const productData = await Product.findOne(queryOptions);
@@ -169,22 +173,23 @@ const orderPlace = async (req, res) => {
                 couponDiscount: couponDiscount || 0
 
             }
-            await Cart.destroy({ where: { id: cartId } })
+            await Cart.destroy({ where: { id: cartId }, transaction: t })
         } else {
             throw new BadRequestException('Cart details not found.')
         }
 
     }
 
-    const order = await Order.create(setData)
+    const order = await Order.create(setData, { transaction: t })
     if (isUsedWallet === true && !isUsedCoupon) {
         walletDetails.walletAmount = walletDetails.walletAmount
-        await walletDetails.save()
+        await walletDetails.save({ transaction: t })
     }
 
     if (!isUsedCoupon && order) {
         await storeCouponForUser(totalAmount, userId || merchantId)
     }
+    await t.commit()
     return res.status(HTTP_STATUS_CODE.OK).json({ status: HTTP_STATUS_CODE.OK, success: true, message: "Order placed successfully." })
 }
 
