@@ -11,10 +11,8 @@ const HTTP_STATUS_CODE = {
 }
 
 const IMAGE_PATH = {
-    PROFILE_IMAGE_URL: 'http://localhost:8000/public/profile/',
     PRODUCT_IMAGE_URL: 'http://localhost:8000/public/products/',
     CATEGORY_IMAGE_URL: 'http://localhost:8000/public/category/',
-    CUSTOM_IMAGE_URL: 'http://localhost:8000/public/customCake/'
 }
 
 module.exports = { HTTP_STATUS_CODE, IMAGE_PATH }
